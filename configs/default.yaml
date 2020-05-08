@@ -1,0 +1,35 @@
+---
+circuitbreaker:
+  registers:
+    NotificationServiceHandler:
+      timeout: 3000
+      retryable: false
+kafka:
+  bootstrapservers: 192.168.56.111:9092
+  clients:
+    - notificationService
+    - advertisingService
+  consumers:
+    notificationservice:
+      topic: user.event.notification
+      groupID: NotificationServiceConsumer
+      concurrency: 1
+      handler:
+        handleFuncName: NotificationServiceHandler
+        endPoints:
+        - "http://localhost:8000/status/500"
+    advertisingService:
+      topic: user.event.advertisement
+      groupID: AdvertisingServiceConsumer
+      concurrency: 3
+      handler:
+        endPoints:
+        - "http://localhost:8000/status/500"
+        - "http://localhost:8000/delay/4"
+#rabbitmq:
+#  username: guest
+#  password: guest
+#  host: localhost:5672
+#  queueName: advertisement
+#  consumerTag: hermes
+#  workers: 2
